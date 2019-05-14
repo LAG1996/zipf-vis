@@ -1,23 +1,62 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <p v-if="showWarning" id="warning">Expected txt file.</p>
+    <input
+      v-on:input="onInput"
+      id="upload-file" type="file"
+    />
+    <article>{{fileContent}}</article>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'app',
   components: {
-    HelloWorld
   },
-  created: () => {
-    fetch('http://localhost:5000/output')
-      .then((resp) => console.log(resp.text()))
-      .catch(() => console.log('aaa'));
+  data: function() {
+    return {
+      showWarning: false,
+      fileContent: '',
+    };
   },
+  methods: {
+    //<events>
+    onInput: function(evt) {
+      this.readFile(evt.target.files[0])
+        .then((result) => {
+          this.printFile(result);
+        })
+        .catch(() => {
+          this.showWarning = true;
+
+          let hideWarning = setInterval(() => {
+            this.showWarning = false;
+            clearInterval(hideWarning);
+          }, 3000);
+        })
+        .finally(() => evt.target.value = "");
+    },
+    //</events>
+
+    //<file handler>
+    readFile: function(file) {
+      const reader = new FileReader();
+
+      if (!(/^text.*/).test(file.type)) {
+        return Promise.reject();
+      }
+
+      reader.readAsText(file);
+      return new Promise((res) => {
+        reader.onload = (() => { res(reader.result); });
+      });
+    },
+    printFile: function(text) {
+      this.fileContent = text;
+    },
+    //</file handler>
+  }
 }
 </script>
 
@@ -26,8 +65,11 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+input {
+  text-align: center;
 }
 </style>
