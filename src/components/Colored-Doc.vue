@@ -1,12 +1,19 @@
 <template>
 	<article>
-		<span v-for="element in elements"></span>
+		{{text}}
 	</article>
 </template>
 
 <script>
-	const component = {};
-	export component;
+	export default {
+		name: 'colored-doc',
+		props: {
+			text: '',
+		},
+		created: function() {
+			console.log(this);
+		}
+	};
 </script>
 
 <style>

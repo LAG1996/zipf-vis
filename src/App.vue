@@ -5,16 +5,22 @@
       v-on:input="onInput"
       id="upload-file" type="file"
     />
-    <article>{{fileContent}}</article>
+    <ColoredDoc
+      v-if="fileContent.length > 0"
+      v-bind:text="fileContent"
+    />
   </div>
 </template>
 
 <script>
+import ColoredDoc from './components/Colored-Doc'
+
 export default {
   name: 'app',
   components: {
+    ColoredDoc,
   },
-  data: function() {
+  data: () => {
     return {
       showWarning: false,
       fileContent: '',
@@ -25,7 +31,7 @@ export default {
     onInput: function(evt) {
       this.readFile(evt.target.files[0])
         .then((result) => {
-          this.printFile(result);
+          this.processFile(result);
         })
         .catch(() => {
           this.showWarning = true;
@@ -52,8 +58,15 @@ export default {
         reader.onload = (() => { res(reader.result); });
       });
     },
-    printFile: function(text) {
-      this.fileContent = text;
+    processFile: function(text) {
+      fetch('http://127.0.0.1:5000/word-freq', {
+        method: 'POST',
+        header: {
+          'Content-Type': 'text/plain',
+        },
+        body: text,
+      }).then(res => res.text())
+      .then((text) => this.fileContent = text);
     },
     //</file handler>
   }
