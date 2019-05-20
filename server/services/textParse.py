@@ -6,6 +6,7 @@ import json
 import re
 
 DEFAULT_REGEX = re.compile('/\w|\d/')
+NONWORD = re.compile('\W');
 
 # create the trie
 '''
@@ -51,7 +52,9 @@ def trieProcess(string = [], regex = DEFAULT_REGEX):
 	stringSet = {}
 	stringArray = regex.split(string)
 	for s in stringArray:
-		if s.isspace() or len(s) == 0:
+		if s.isspace() or len(s) == 0 or NONWORD.match(s):
+			if s not in stringSet:
+				stringSet[s] = 0
 			continue
 
 		stringSet[s.lower()] = _insert(s.lower())

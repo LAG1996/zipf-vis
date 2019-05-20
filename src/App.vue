@@ -29,6 +29,7 @@ export default {
   methods: {
     //<events>
     onInput: function(evt) {
+      this.fileContent = '';
       this.readFile(evt.target.files[0])
         .then((result) => {
           this.processFile(result);
@@ -66,7 +67,7 @@ export default {
         },
         body: text,
       }).then(res => res.text())
-      .then((text) => this.fileContent = text);
+      .then((text) => this.fileContent = JSON.parse(text.replace('\n', '<br/>')));
     },
     //</file handler>
   }

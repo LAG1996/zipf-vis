@@ -14,14 +14,18 @@ cors = CORS(app, resources={r"/word-freq": {"origins":"http://localhost:port"}})
 @app.route('/word-freq', methods=['GET', 'POST'])
 @cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def output():
-	return (
-		json.dumps(
-			trieProcess(
-				json.dumps(request.data),
-				re.compile('\W+')
+	text = request.data.decode('utf-8')
+	regex = re.compile('(\W+)')
+	freqs = trieProcess(text, regex)
+
+	splitText = regex.split(text)
+	return json.dumps(
+		list(
+			map(lambda string: [string, freqs[string.lower()]], splitText)
 			)
 		)
-	)
+
+
 
 if __name__ == "__main__":
 	app.run()
